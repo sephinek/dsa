@@ -14,10 +14,6 @@ class HashTable {
     return hash % max;
   }
 
-  printTable() {
-    console.log(this.storage);
-  }
-
   set(key, value) {
     const index = this._hash(key, this.limit);
 
@@ -26,12 +22,91 @@ class HashTable {
     } else {
       let inserted = false;
 
-      for (let i = 0; i < this.storage[index].length; i++) {}
+      for (let i = 0; i < this.storage[index].length; i++) {
+        if (this.storage[index][i][0] === key) {
+          this.storage[index][i][0] = value;
+          inserted = true;
+        }
+      }
+
+      if (inserted === false) {
+        this.storage[index].push([key, value]);
+      }
     }
+  }
+
+  get(key) {
+    const index = this._hash(key, this.limit);
+
+    if (this.storage[index] === undefined) {
+      return undefined;
+    } else {
+      for (let i = 0; i < this.storage[index].length; i++) {
+        if (this.storage[index][i][0] === key) {
+          return this.storage[index][i][1];
+        }
+      }
+    }
+  }
+
+  printTable() {
+    for (let i = 0; i < this.storage.length; i++) {
+      if (this.storage[i] !== undefined) {
+        console.log(`Bucket ${i}: ${JSON.stringify(this.storage[i])}`);
+      } else {
+        console.log(`Bucket ${i} Empty`);
+      }
+    }
+  }
+
+  remove(key) {
+    const index = this._hash(key, this.limit);
+
+    if (this.storage[index]) {
+      if (
+        this.storage[index].length === 1 &&
+        this.storage[index][0][0] === key
+      ) {
+        delete this.storage[index];
+      } else {
+        for (let i = 0; i < this.storage[index].length; i++) {
+          if (this.storage[index][i][0] === key) {
+            delete this.storage[index][i];
+          }
+        }
+      }
+    }
+  }
+
+  has(key) {
+    const index = this._hash(key, this.limit);
+
+    if (this.storage[index]) {
+      for (let i = 0; i < this.storage[index].length; i++) {
+        if (this.storage[index][i][0] === key) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  clear() {
+    this.storage = [];
   }
 }
 
 const myHashTable = new HashTable();
-const result = myHashTable._hash('John', myHashTable.limit);
-myHashTable.printTable();
+// const result = myHashTable._hash('John', myHashTable.limit);
 // console.log(result);
+myHashTable.set('John', '555-234-3455');
+myHashTable.set('James', '555-349-3948');
+myHashTable.set('Sara', '555-469-3334');
+myHashTable.remove('James');
+console.log(myHashTable.get('John'));
+console.log(myHashTable.get('James'));
+myHashTable.printTable();
+console.log(myHashTable.has('James'));
+console.log(myHashTable.has('John'));
+myHashTable.clear();
+myHashTable.printTable();
